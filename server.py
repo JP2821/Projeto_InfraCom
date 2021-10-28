@@ -1,41 +1,37 @@
 import socket
+import time
 import threading
 
-Host = input("Host: ")
-Port = int(input("Port: "))
+def main():
+    Host = str(input("Host: "))
+    Port = int(input("Port: "))
 
-print('conectei')
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #que é a conexão que aceita UDP
-server.bind((Host, Port)) #será a parte que executa a ligação entre o client e o server
+    print('conectei')
 
-clients = []
-nomeDosUsuarios = []
+    server.bind((Host, Port))
 
-def globalMessage(message):
-    # utilizamos esse for para apartir da nossa lista de clients mandar a mensagem para todos os
-    # clients conectados ao nosso servidor
-    for client in clients:
-        client.send(message)
+    clients = []
+    usernames = []
 
-def handleMessages(client):
+    name = server.recvfrom(1024)
+
+    global name
+
     while True:
-        try:
-            mensagemRecebidaDoClient = client.recv(2048).decode('ascii')
-            globalMessage(f'{nomeDosUsuarios[clients.index(client)]} -> {mensagemRecebidaDoClient}'.encode('ascii'))
-        except:
-            client_saiu = nomeDosUsuarios.index(client)
-            client.close()
-            clients.remove(client_saiu)
-            nome_do_client_exit = nomeDosUsuarios[client_saiu]
-            nomeDosUsuarios.remove(nome_do_client_exit)
+        client, address = server.recvfrom(1024)
+        print(f"conexão estabelecida [IP, Porta]: {address}")
+        print("Mensagem recebida de", str(address))
+        tempo = time.strftime('%H:%M:%S')
+        print(f"{tempo} {name}:", str(client))
+
+        server.sendto(client, address)
+
+        if client == 'bye':
+            server.close()
 
 
-def initconection():
-    while True:
-        client, address = server.recvfrom()
-        print(f'Nova conexão: {address}')
 
-
-initconection()
-
+if __name__ == '__main__':
+    main()
