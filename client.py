@@ -1,12 +1,31 @@
 import socket
 import threading
 
-serverIP= input("Server IP: ")
-Port = int(input("Port: "))
+def main():
+    serverIP = input("Server IP: ")
+    Port = int(input("Port: "))
 
-client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server = (serverIP, Port)
 
-try:
-    client.connect((serverIP, Port))
-except:
-    print(f"Reveja os seus dados: {serverIP}:{Port}")
+    conexao = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    conexao.connect((serverIP, Port))
+
+    nick_name = str(input("Qual seu nickname: "))
+
+    conexao.sendto(nick_name.encode(), server)
+
+    while True:
+        msg = input("-> ")
+        if msg == 'bye':
+            conexao.sendto(msg.encode(), server)
+            client, endereco = conexao.recvfrom(1024)
+            print("Recebida ->", str(client))
+            conexao.close()
+        else:
+            conexao.sendto(msg.encode(), server)
+            servidor, endereco = conexao.recvfrom(1024)
+            print("Recebida ->", str(servidor))
+
+
+if __name__ == '__main__':
+    main()
