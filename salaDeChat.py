@@ -1,4 +1,5 @@
 import socket
+import time
 import threading
 import os
 
@@ -13,11 +14,14 @@ ip, port = input("Enter IP address and Port number: ").split()
 
 def send():
     while True:
+        tempo = time.strftime('%H:%M:%S')
         ms = input(">> ")
-        if ms == "quit":
-            os.exit(1)
-        sm = "{}  : {}".format(nm,ms)
-        s.sendto(sm.encode() , (ip,int(port)))
+        if ms == "bye":
+            sm = "{} {}  : {}".format(tempo, nm, ms)
+            s.sendto(sm.encode(), (ip, int(port)))
+            fechar_conexao()
+        sm = "{} {}  : {}".format(tempo,nm,ms)
+        s.sendto(sm.encode(), (ip, int(port)))
 
 def rec():
     while True:
@@ -26,6 +30,9 @@ def rec():
         print(">> ")
 x1 = threading.Thread( target = send )
 x2 = threading.Thread( target = rec )
+
+def fechar_conexao():
+    s.close()
 
 x1.start()
 x2.start()
