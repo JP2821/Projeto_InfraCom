@@ -17,7 +17,7 @@ def main():
 
     name = server.recvfrom(1024)
 
-    global name
+
 
     while True:
         client, address = server.recvfrom(1024)
@@ -29,6 +29,7 @@ def main():
         server.sendto(client, address)
 
         if client == 'bye':
+            print("[SERVE CLOSED]")
             server.close()
 
 
