@@ -1,7 +1,7 @@
 import socket
 import threading
 
-def main():
+def Client():
     serverIP = input("Server IP: ")
     Port = int(input("Port: "))
 
@@ -28,4 +28,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    Client()
