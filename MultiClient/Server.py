@@ -8,14 +8,15 @@ server = socket.socket(socket.AF_INET , socket.SOCK_DGRAM )
 server.bind((ip, port))
 
 clients = []
-
+client_name = {}
 
 
 
 def accept_client(ClientName,ClientAdress):
 
+    ClientName = str(ClientName).split(' ')[2][:-1]
     clients.append(ClientAdress)
-    
+    client_name[ClientAdress] = ClientName
     print("client:", ClientName,"connected")
     server.sendto("voce esta conectado".encode(),ClientAdress)
 
@@ -23,7 +24,7 @@ def accept_client(ClientName,ClientAdress):
 
 #envia mensagem para todo mundo
 def Broadcast(msg,author):
-    msg = ">>" + msg 
+    msg = '\n' + client_name[author] + "\n>>"+ msg 
     print(msg)
     for ClientAdress in clients:
         if ClientAdress == author: continue
