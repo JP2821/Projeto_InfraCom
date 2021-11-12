@@ -46,6 +46,15 @@ for i in range(numero_de_pacotes):
 tempo_de_dowload = round(time.time() - start, 2)
 print(f"dowload concluido, tempo transcorrido {tempo_de_dowload} sec")
 
+arquivo.close()
+
+arquivo = open(arquivos[arquivo_escolhido], "rb")
+#enviando de volta:
+print("arquivo:")
+for line in arquivo:
+    print(line)
+
+
 #limpando a casa
 arquivo.close()
 servidor.close()
