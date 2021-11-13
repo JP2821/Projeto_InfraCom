@@ -3,7 +3,7 @@ from threading import Thread
 
 print("\t\t\t====>  UDP CHAT APP  <=====")
 print("==============================================")
-ip, port = "192.168.56.1",80
+ip, port = "192.168.56.1",50000
 server = socket.socket(socket.AF_INET , socket.SOCK_DGRAM )
 server.bind((ip, port))
 

@@ -27,7 +27,7 @@ def Client():
    #serverIP = input("Server IP: ")
    #Port = int(input("Port: "))
     
-    serverIP,Port = '192.168.56.1',80
+    serverIP,Port = '192.168.56.1',50000
 
     server = (serverIP, Port)
 
