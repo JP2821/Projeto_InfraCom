@@ -86,13 +86,10 @@ while 1:
         dados_corrompidos.append(dado)
     while (seq == 1 or soma != checksum):
         if (fist_time == 1):
-
-            msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 0)
-
             try:
-                #Enviadando ao cliente a mensagem de pacotes duplicados
-                msg = msg.encode()
+                #Enviando ao cliente a mensagem de pacotes duplicados
                 server.sendto(msg, address)
+                print('cheguei bb')
             except socket.error as msg:
                 print('Código do erro: ' + str(msg[0]) + '.Messagem: ' + msg[1])
                 sys.exit()
@@ -115,6 +112,8 @@ while 1:
         dado = int(data[65:97], 2)
 
         soma = funcoes.checksum(portaorigem, portadestino, comprimento)
+
+    print('saiu')
 
     if (seq == 0 and soma == checksum):
         dados_recebidos.append(dado)
@@ -175,29 +174,19 @@ while 1:
         print("\nPacote [" + str(dado) + "] com erro de bits! Descartando e re-solicitando...")
         dados_corrompidos.append(dado)
     while seq == 0 or soma != checksum:
-
-        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 0)
-
         try:
-            print("PORRAAAAAAAAAAAA!")
-            msg = msg.encode()
             server.sendto(msg, address)
         except socket.error as msg:
             print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
             sys.exit()
 
-        print("Cheguei")
-
         # Recebendo dados do cliente (dados,  endereço)
         mensagem = server.recvfrom(tamanho_do_pacote)
-        print("Recebi")
         data = mensagem[0]
-        data = data.decode()
         address = mensagem[1]
 
         if not data:
             break
-
 
         #Extraindo dados do pacote
         portaorigem = int(data[0:16], 2)
@@ -210,7 +199,7 @@ while 1:
 
         soma = funcoes.checksum(portaorigem, portadestino, comprimento)
 
-    if (seq == 0 and soma == checksum):
+    if (seq == 1 and soma == checksum):
         dados_recebidos.append(dado)
         dados_recebidos_ordem.append(dado)
         dados_recebidos_ordem.sort()
@@ -224,16 +213,11 @@ while 1:
         print("\nPacotes corrompidos:")
         print(dados_corrompidos)
 
-        #print("sera ?")
-
-        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 0)
-
-        #print("Achei ?")
+        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 1)
 
         try:
             # Enviando mensagem ao cliente
             msg = msg.encode()
-            print("Teste")
             server.sendto(msg, address)
         except socket.error as msg:
             print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
