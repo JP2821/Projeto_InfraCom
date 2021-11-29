@@ -1,5 +1,3 @@
 Para executar a aplicação, executar primeiramente o servidor. "python servidor.py"
 Logo após, executar o cliente. "python cliente.py entrada", onde entrada é o nome do arquivo com os inteiros a serem enviados.
 Existe um exemplo de entrada na pasta, mas tem um pequeno script "geraEntrada.py" para gerar outras também.
-
-o erro ocorre na linha 177
