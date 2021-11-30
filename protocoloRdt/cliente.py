@@ -1,6 +1,7 @@
 import socket
 import sys
 import funcoes
+import time
 import random
 
 # 1 - Declarando as variaveis de cabeçalho
@@ -80,7 +81,6 @@ while len(array) > 1:
     # Recebendo mensagem do servidor
     mensagem = client.recvfrom(tamanho_do_pacote)
     data = mensagem[0]
-    data = data.decode()
     address = mensagem[1]
 
     if not data:
@@ -106,7 +106,6 @@ while len(array) > 1:
         #Recebendo a mensagem do servidor
         mensagem = client.recvfrom(tamanho_do_pacote)
         data = mensagem[0]
-        data = data.decode()
         address = mensagem[1]
 
         portaorigemservidor = int(data[0:16], 2)
@@ -120,7 +119,6 @@ while len(array) > 1:
 
         if not data:
             break
-
 
     #Estado 2
 
@@ -185,7 +183,7 @@ while len(array) > 1:
 
         soma = funcoes.checksum(portaorigem, port, comprimento)
         seq = 1
-        msg = funcoes.cria_pacote_cliente(portaorigem, port, comprimento, soma, seq, dados)
+        msg = funcoes.cria_pacote_cliente(portaorigem, port, comprimento, soma, seq, dado)
         msg = msg.encode()
         client.sendto(msg, (host, port))
 
