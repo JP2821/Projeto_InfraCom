@@ -52,7 +52,7 @@ while len(array) > 1:
     if dados == -1:
         break
 
-    # Forçar o erro de bits mudando a sma de verificação
+    # Forçar o erro de bits mudando a soma de verificação
     if escolha == 2:
         soma = 0
     else:
@@ -79,19 +79,12 @@ while len(array) > 1:
 
     # Estado 1
     # Recebendo mensagem do servidor
-    mensagem = client.recvfrom(tamanho_do_pacote)
-    data = mensagem[0]
-    address = mensagem[1]
+    data, address = client.recvfrom(tamanho_do_pacote)
 
     if not data:
         break
 
-    portaorigemservidor = int(data[0:16], 2)
-    portadestinoservidor = int(data[16:32], 2)
-    comprimentoservidor = int(data[32:48], 2)
-    ackservidor = int(data[48:49], 2)
-    seqservidor = int(data[49:50], 2)
-    somaservidor = int(data[50:66], 2)
+    portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor  = funcoes.extrair_dados_cliente(data)
 
     vericar_soma = funcoes.checksum(portadestinoservidor, portadestinoservidor, comprimentoservidor)
 
@@ -103,21 +96,20 @@ while len(array) > 1:
         msg = msg.encode()
         client.sendto(msg, (host, port))
 
-        #Recebendo a mensagem do servidor
-        mensagem = client.recvfrom(tamanho_do_pacote)
-        data = mensagem[0]
-        address = mensagem[1]
+        # Colocar thread para fazer isso.
+        # cronometrar o tempo ate chegar, 
+        # quando a mensagem chegar
+        # a thread que instanciamos 
+        # faz a atual parar de esperar
 
-        portaorigemservidor = int(data[0:16], 2)
-        portadestinoservidor = int(data[16:32], 2)
-        comprimentoservidor = int(data[32:48], 2)
-        ackservidor = int(data[48:49], 2)
-        seqservidor = int(data[49:50], 2)
-        somaservidor = int(data[50:66], 2)
+        # Recebendo a mensagem do servidor
+        data,address = client.recvfrom(tamanho_do_pacote)
+      
+        portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor = funcoes.extrair_dados_cliente(data)
 
         vericar_soma = funcoes.checksum(portaorigemservidor, portadestinoservidor, comprimentoservidor)
 
-        if not data:
+        if not data: #fim da comunicacao
             break
 
     #Estado 2
@@ -163,19 +155,12 @@ while len(array) > 1:
     #Estado 3
     # Recebendo mensagem do servidor
 
-    mensagem = client.recvfrom(tamanho_do_pacote)
-    data = mensagem[0]
-    address = mensagem[1]
+    data, address = client.recvfrom(tamanho_do_pacote)
 
     if not data:
         break
 
-    portaorigemservidor = int(data[0:16], 2)
-    portadestinoservidor = int(data[16:32], 2)
-    comprimentoservidor = int(data[32:48], 2)
-    ackservidor = int(data[48:49], 2)
-    seqservidor = int(data[49:50], 2)
-    somaservidor = int(data[50:66], 2)
+    portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor = funcoes.extrair_dados_cliente(data)
 
     vericar_soma = funcoes.checksum(portadestinoservidor, portadestinoservidor, comprimentoservidor)
 
@@ -188,20 +173,15 @@ while len(array) > 1:
         client.sendto(msg, (host, port))
 
         #Recebendo a mensagem do servidor
-        mensagem = client.recvfrom(tamanho_do_pacote)
-        data = mensagem[0].decode()
-        address = mensagem[1]
+        data, address = client.recvfrom(tamanho_do_pacote)
+        
+        if not data:
+            break
 
-        portaorigemservidor = int(data[0:16], 2)
-        portadestinoservidor = int(data[16:32], 2)
-        comprimentoservidor = int(data[32:48], 2)
-        ackservidor = int(data[48:49], 2)
-        seqservidor = int(data[49:50], 2)
-        somaservidor = int(data[50:66], 2)
+        portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor = funcoes.extrair_dados_cliente(data)
 
         vericar_soma = funcoes.checksum(portadestinoservidor, portadestinoservidor, comprimentoservidor)
 
-        if not data:
-            break
+
 
 client.close()
