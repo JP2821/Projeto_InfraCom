@@ -45,3 +45,34 @@ def cria_pacote_servidor(porta_origem, porta_destino, comprimento, ack, seq):
     soma = checksum(porta_origem, porta_destino, comprimento)
     pacote = bin(porta_origem)[2:].zfill(16) + bin(porta_destino)[2:].zfill(16) + bin(comprimento)[2:].zfill(16) + bin(ack)[2:].zfill(1) + bin(seq)[2:].zfill(1) + bin(soma)[2:].zfill(16)
     return pacote
+
+# serve para servidor extrair dados enviados pelo cliente
+def extrair_dados_servidor(data):
+    portaorigem  = int(data[0:16], 2)
+    portadestino = int(data[16:32], 2)
+    comprimento  = int(data[32:48], 2)
+    checksum     = int(data[48:64], 2)
+    seq          = int(data[64:65], 2)
+    dado         = int(data[65:97], 2)
+
+    return portaorigem , portadestino, comprimento , checksum,   seq   , dado        
+
+def extrair_dados_cliente(data):
+    
+    portaorigemservidor  = int(data[0:16], 2)
+    portadestinoservidor = int(data[16:32], 2)
+    comprimentoservidor  = int(data[32:48], 2)
+    ackservidor          = int(data[48:49], 2)
+    seqservidor          = int(data[49:50], 2)
+    somaservidor         = int(data[50:66], 2)
+
+    return portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor  
+
+def print_info_servidor(dado,dados_recebidos,dados_duplicados,dados_corrompidos):
+    print("\nPacote [" + str(dado) + "] recebido corretamente!")
+    print("\nPacotes recebidos até o momento:")
+    print(dados_recebidos)
+    print("\nPacotes duplicados:")
+    print(dados_duplicados)
+    print("\nPacotes corrompidos:")
+    print(dados_corrompidos)      
