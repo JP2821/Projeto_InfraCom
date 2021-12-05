@@ -4,12 +4,12 @@ class Node:
         self.next = next
         self.prev = prev
     
-class DeletionSet: #circular linked list with array of address
+class DeletionSet: #circular linked list + array of addresses
 
     def __init__(self,N=100):
 
         self.nodeAddress = [None]*N
-        self.sentinela = Node(0) # node extra no inicio para poder exclui
+        self.sentinela = Node(0) # node extra no inicio para poder excluir sem checar
 
         last = Node(0,prev = self.sentinela)
         self.sentinela.next = last
@@ -31,7 +31,7 @@ class DeletionSet: #circular linked list with array of address
     # nao apagar elemento ja apagado
     def del_node(self,index):
         node = self.nodeAddress[index]
-        
+        #no if
         (node.prev).next = node.next
         (node.next).prev = node.prev
         
@@ -49,7 +49,7 @@ class DeletionSet: #circular linked list with array of address
 #test code
 if __name__ == "__main__":
 
-    S = DeletionSet(5)
+    S = DeletionSet(10)
     print(S.parse(),'\n')
     while True:
         entrada = input("0: sair\n1: deletar\ncomando:")
