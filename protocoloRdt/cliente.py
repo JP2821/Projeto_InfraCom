@@ -3,7 +3,6 @@ import sys
 import funcoes
 import time
 import random
-from threading import Thread
 
 # 1 - Declarando as variaveis de cabeçalho
 host = 'localhost'
@@ -68,22 +67,21 @@ while len(array) > 1:
     #Encerrando cliente
     if escolha == 5:
         sys.exit()
-    
+
     msg = funcoes.cria_pacote_cliente(portaorigem, port, comprimento, soma, seq, dados)
-    buffer = [None]
-    funcoes.enviar_msg(msg)
 
-    while buffer[0] is None:    
-
+    try: #Enviando o datagrama para o servidor
+        msg = msg.encode()
+        client.sendto(msg, (host, port))
+    except socket.error as msg:
+        print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
+        sys.exit()
 
     # Estado 1
     # Recebendo mensagem do servidor
-        
-        time.sleep(1) # "timer" ligado
-        data = buffer[0]
+    data, address = client.recvfrom(tamanho_do_pacote)
 
-    
-    if not data:# fim da comunicacao
+    if not data:
         break
 
     portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor  = funcoes.extrair_dados_cliente(data)
@@ -104,16 +102,8 @@ while len(array) > 1:
         # a thread que instanciamos 
         # faz a atual parar de esperar
 
-        buffer = [None]
-        while data is None:
-            t = Thread(target = funcoes.enviar_msg,args = (client,tamanho_do_pacote,data))
-            t.start()
-            
-            time.sleep(1) # "timer" ligado
-            t.terminate()
-            data = buffer[0]
-            # Recebendo a mensagem do servidor
-            data,address = client.recvfrom(tamanho_do_pacote)
+        # Recebendo a mensagem do servidor
+        data,address = client.recvfrom(tamanho_do_pacote)
       
         portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor = funcoes.extrair_dados_cliente(data)
 
@@ -165,14 +155,7 @@ while len(array) > 1:
     #Estado 3
     # Recebendo mensagem do servidor
 
-    buffer = [None]
-    while data is None:
-        t = Thread(target = funcoes.enviar_msg,args = (client,tamanho_do_pacote,data))
-        t.start()
-        
-        time.sleep(1) # "timer" ligado
-        t.terminate()
-        data = buffer[0]
+    data, address = client.recvfrom(tamanho_do_pacote)
 
     if not data:
         break
@@ -190,15 +173,7 @@ while len(array) > 1:
         client.sendto(msg, (host, port))
 
         #Recebendo a mensagem do servidor
-        buffer = [None]
-        while data is None:
-            t = Thread(target = funcoes.enviar_msg,args = (client,tamanho_do_pacote,data))
-            t.start()
-            
-            time.sleep(1) # "timer" ligado
-            t.terminate()
-            data = buffer[0]
-            
+        data, address = client.recvfrom(tamanho_do_pacote)
         
         if not data:
             break
