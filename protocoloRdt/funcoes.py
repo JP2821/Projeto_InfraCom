@@ -1,6 +1,8 @@
 import socket
 import sys
 import os
+from threading import Thread
+import time
 
 def menu(array):
     os.system('clear')
@@ -75,4 +77,23 @@ def print_info_servidor(dado,dados_recebidos,dados_duplicados,dados_corrompidos)
     print("\nPacotes duplicados:")
     print(dados_duplicados)
     print("\nPacotes corrompidos:")
-    print(dados_corrompidos)      
+    print(dados_corrompidos)     
+
+# rotina de thread para enviar mensagem e
+# poder ser terminada pela main
+# ao ocorrer timeout do timer
+def enviar_msg(*args): 
+    client,msg,host,port = args
+
+    try: #Enviando o datagrama para o servidor
+        msg = msg.encode()
+        client.sendto(msg, (host, port))
+    except socket.error as msg:
+        print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
+        sys.exit()
+    
+def esperar_ack(*args):
+    client,tamanho_do_pacote,buffer = args
+    # Recebendo a mensagem do servidor
+    buffer[0],address = client.recvfrom(tamanho_do_pacote)
+    return
