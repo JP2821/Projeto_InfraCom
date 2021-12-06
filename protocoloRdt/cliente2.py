@@ -57,13 +57,13 @@ escuta.start()
 # numero seq que deve ser enviado
 seq = 0
 
-for dados in array:
+for index,dados in enumerate(array):
     soma = funcoes.checksum(portaorigem, port, comprimento)
     dados = int(dados)  
     if dados == -1: break
     
     if user_friendly:
-        escolha = funcoes.menu(array)
+        escolha = funcoes.menu(array,index)
         # Forçar o erro de bits mudando a soma de verificação
         if escolha == 2: soma += 42
         # Forçando pacotes duplicados

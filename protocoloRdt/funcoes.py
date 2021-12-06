@@ -4,11 +4,11 @@ import os
 from threading import Thread
 import time
 
-def menu(array):
+def menu(array,index = 0):
     os.system('clear')
     print("\n----------------------------------------------")
     print("Lista de pacotes a serem enviados: ")
-    print(array[0:len(array) - 1])
+    print(array[index:len(array) - 1])
     print("\nOpções:")
     print("\n1 - Enviar próximo pacote")
     print("2 - Corromper envio do próximo pacote")
