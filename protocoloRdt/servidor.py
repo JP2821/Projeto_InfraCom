@@ -29,29 +29,30 @@ dados_corrompidos = []
 dado = 0
 i = 0
 
-# Criando Sockets UDP
-try:
-    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    print('\nSocket criado com sucesso!')
-except socket.error as msg:
-    print('\nFalha ao criar o socket. Código do erro: ' + str(msg[0]) + '. Mensagem: ' + msg[1])
-    sys.exit()
+while True:
+    # Criando Sockets UDP
+    try:
+        server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print('\nSocket criado com sucesso!')
+        break
+    except socket.error as msg:
+        print('\nFalha ao criar o socket. Código do erro: ' + str(msg[0]) + '. Mensagem: ' + msg[1])
 
-# Conectando o socket ao localhost e a porta definida
-try:
-    server.bind((host, port))
-except socket.error as msg:
-    print('\nBind falhou. Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
-    sys.exit()
-print('\nBind do Socket completo!')
+while True:
+    # Conectando o socket ao localhost e a porta definida
+    try:
+        server.bind((host, port))
+        print('\nBind do Socket completo!')
+        break
+    except socket.error as msg:
+        print('\nBind falhou. Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
 
 # Aqui iremos fazer um contador de estados
 # para saber se é a primeira vez que ele entra nesse estado
 fist_time = 0
-
-while 1:
-
-    # Estado 0
+seq_esperado = 0
+server_on = True
+while server_on:
 
     # Recebendo dados do cliente (dados, endereço)
     data, address = server.recvfrom(tamanho_do_pacote)
@@ -70,7 +71,9 @@ while 1:
 
     soma = funcoes.checksum(portaorigem, portadestino, comprimento)
 
-    if seq == 1:
+    # tratarmante de erros e checagens:
+
+    if seq != seq_esperado:
         print("\nPacote [" + str(dadoanterior) + "] duplicado! Descartando e re-solicitando...")
         dados_duplicados.append(dadoanterior)
 
@@ -78,25 +81,27 @@ while 1:
         print("\nPacote [" + str(dado) + "] com erro de bits! Descartando e re-solicitando...")
         dados_corrompidos.append(dado)
 
-    while (seq == 1 or soma != checksum):
-        if (fist_time == 1):
+    # erro no pacote recebido
+    while (seq != seq_esperado or soma != checksum):
 
-            msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 1)
+        # envia pacote com ack errado para avisar o erro
+        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1 - seq_esperado,
+                                           1 - seq_esperado)
 
-            try:
-                funcoes.print_info_servidor(dado, dados_recebidos, dados_duplicados, dados_corrompidos)
-                # Enviando ao cliente a mensagem de pacotes duplicados
-                server.sendto(msg, address)
-                print('cheguei bb')
-            except socket.error as msg:
-                print('Código do erro: ' + str(msg[0]) + '.Messagem: ' + msg[1])
-                sys.exit()
+        try:
+            funcoes.print_info_servidor(dado, dados_recebidos, dados_duplicados, dados_corrompidos)
+            # Enviando ao cliente a mensagem de pacotes duplicados
+            server.sendto(msg, address)
+
+        except socket.error as msg:
+            print('Código do erro: ' + str(msg[0]) + '.Messagem: ' + msg[1])
+            continue  # try again
 
         # Recebendo dados do cliente (dados, endereço)
         data, address = server.recvfrom(tamanho_do_pacote)
 
-        if not data:
-            break
+        if not data:  # erro, tenta novamente
+            continue
 
         # Extraindo dados do pacote
         dadoanterior = dado
@@ -104,82 +109,32 @@ while 1:
 
         soma = funcoes.checksum(portaorigem, portadestino, comprimento)
 
-    if (seq == 0 and soma == checksum):
-        dados_recebidos.append(dado)
+    if server_on == False: break
+
+    # caso pacote nao tenha problemas:
+    dados_recebidos.append(dado)
+
+    # enviar ack correto:
+
+    while True:
+        i += 1
+        os.system('clear')
+        print("\n------------------------------------------")
+        print("\tEnvio do", i, "º pacote")
+        print("------------------------------------------")
 
         funcoes.print_info_servidor(dado, dados_recebidos, dados_duplicados, dados_corrompidos)
-
-        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 0)
+        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, seq_esperado,
+                                           0)  # ack =0
 
         try:
             # Enviando mensagem ao cliente
             server.sendto(msg, address)
-        except socket.error as msg:
-            print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
-            sys.exit()
-        fist_time = 1
-
-    # Estado 1
-    # Recebendo dados do cliente (dados, endereço)
-    data, address = server.recvfrom(tamanho_do_pacote)
-    data = data.decode()
-
-    if not data:
-        break
-
-    # Extraindo dados do pacote
-    dadoanterior = dado
-    portaorigem, portadestino, comprimento, checksum, seq, dado = funcoes.extrair_dados_servidor(data)
-
-    soma = funcoes.checksum(portaorigem, portadestino, comprimento)
-
-    i += 1
-    os.system('clear')
-    print("\n------------------------------------------")
-    print("\tEnvio do", i, "º pacote")
-    print("------------------------------------------")
-
-    if seq == 0:
-        print("\nPacote [" + str(dadoanterior) + "] duplicado! Descartando e re-solicitando...")
-        dados_duplicados.append(dadoanterior)
-
-    if soma != checksum:
-        print("\nPacote [" + str(dado) + "] com erro de bits! Descartando e re-solicitando...")
-        dados_corrompidos.append(dado)
-
-    while seq == 0 or soma != checksum:
-
-        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 0)
-
-        try:
-            server.sendto(msg, address)
-        except socket.error as msg:
-            print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
-            sys.exit()
-
-        # Recebendo dados do cliente (dados,  endereço)
-        data, address = server.recvfrom(tamanho_do_pacote)
-
-        if not data:
             break
-
-        # Extraindo dados do pacote
-        dadoanterior = dado
-        portaorigem, portadestino, comprimento, checksum, seq, dado = funcoes.extrair_dados_servidor(data)
-        soma = funcoes.checksum(portaorigem, portadestino, comprimento)
-
-    if (seq == 1 and soma == checksum):
-        dados_recebidos.append(dado)
-
-        funcoes.print_info_servidor(dado, dados_recebidos, dados_duplicados, dados_corrompidos)
-
-        msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 1)
-
-        try:
-            # Enviando mensagem ao cliente
-            server.sendto(msg, address)
         except socket.error as msg:
             print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
-            sys.exit()
+            continue
+
+    seq_esperado = 1 - seq_esperado
 
 server.close()
