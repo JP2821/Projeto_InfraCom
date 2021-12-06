@@ -83,6 +83,9 @@ while 1:
     while (seq == 1 or soma != checksum):
         if (fist_time == 1):
             try:
+                funcoes.print_info_servidor(dado,  dados_recebidos,  dados_duplicados,  dados_corrompidos)
+
+                msg = funcoes.cria_pacote_servidor(server.getsockname()[1], port, comprimento_servidor, 1, 1)
                 #Enviando ao cliente a mensagem de pacotes duplicados
                 server.sendto(msg, address)
                 print('cheguei bb')
