@@ -13,7 +13,7 @@ def menu(array):
     print("\n1 - Enviar próximo pacote")
     print("2 - Corromper envio do próximo pacote")
     print("3 - Duplicar envio do próximo pacote")
-    print("4 - Embaralhar pacotes")
+    
     print("5 - Sair\n")
     escolha = 0
     while (escolha < 1 or escolha > 5):
@@ -82,18 +82,21 @@ def print_info_servidor(dado,dados_recebidos,dados_duplicados,dados_corrompidos)
 # rotina de thread para enviar mensagem e
 # poder ser terminada pela main
 # ao ocorrer timeout do timer
-def enviar_msg(*args): 
-    client,msg,host,port = args
+def enviar_msg(client,msg,host,port): 
 
-    try: #Enviando o datagrama para o servidor
-        msg = msg.encode()
-        client.sendto(msg, (host, port))
-    except socket.error as msg:
-        print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
-        sys.exit()
-    
+    while True:
+        try: #Enviando o datagrama para o servidor
+            msg = msg.encode()
+            client.sendto(msg, (host, port))
+            break
+        except socket.error as msg:
+            print('Código do erro: ' + str(msg[0]) + '. Messagem: ' + msg[1])
+            print("tentando novamente...")
+
+#daemon thread para ouvir mensagens
 def esperar_ack(*args):
-    client,tamanho_do_pacote,buffer = args
-    # Recebendo a mensagem do servidor
-    buffer[0],address = client.recvfrom(tamanho_do_pacote)
-    return
+    while True:
+        client,tamanho_do_pacote,buffer = args
+        # Recebendo a mensagem do servidor
+        buffer[0],address = client.recvfrom(tamanho_do_pacote)
+
