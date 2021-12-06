@@ -91,12 +91,12 @@ for index,dados in enumerate(array):
 
         data = buffer[0]
 
-        portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , seqservidor  , somaservidor  = funcoes.extrair_dados_cliente(data)
+        portaorigemservidor , portadestinoservidor, comprimentoservidor , ackservidor  , _  , somaservidor  = funcoes.extrair_dados_cliente(data)
 
         vericar_soma = funcoes.checksum(portadestinoservidor, portadestinoservidor, comprimentoservidor)
 
         # pacote com erros
-        if somaservidor != vericar_soma or (ackservidor == 1-seq and seqservidor == 1-seq):
+        if somaservidor != vericar_soma or (ackservidor == 1-seq):
             tcounter = 0 # reinicia o timer
         
         # pacote chegou sem erros
