@@ -46,7 +46,10 @@ def cria_pacote_cliente(porta_origem, porta_destino, comprimento, soma, seq, dad
 def cria_pacote_servidor(porta_origem, porta_destino, comprimento, ack, seq):
     soma = checksum(porta_origem, porta_destino, comprimento)
     pacote = bin(porta_origem)[2:].zfill(16) + bin(porta_destino)[2:].zfill(16) + bin(comprimento)[2:].zfill(16) + bin(ack)[2:].zfill(1) + bin(seq)[2:].zfill(1) + bin(soma)[2:].zfill(16)
+    
     return pacote
+
+
 
 # serve para servidor extrair dados enviados pelo cliente
 def extrair_dados_servidor(data):
